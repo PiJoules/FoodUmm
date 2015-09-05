@@ -1,4 +1,7 @@
 
+import vendor
+vendor.add('lib')
+
 # Import the Flask Framework
 from flask import Flask, render_template, jsonify, request, url_for
 app = Flask(__name__)
@@ -25,6 +28,10 @@ def test_route():
 	response.close()
 	return jsonify(response=json.loads(text))
 
+@app.route("/redirect")
+def redirect_route():
+	return render_template("redirect.html")
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Return a custom 404 error."""
@@ -35,3 +42,6 @@ def page_not_found(e):
 def application_error(e):
     """Return a custom 500 error."""
     return 'Sorry, unexpected error: {}'.format(e), 500
+
+if __name__ == "__main__":
+	app.run()
