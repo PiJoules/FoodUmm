@@ -10,7 +10,7 @@ import json
 
 @app.route("/")
 def index_route():
-	return render_template("index.html")
+	return render_template("index.html", poop="poopkksjdn")
 
 @app.route("/test")
 def test_route():
