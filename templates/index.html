@@ -1,9 +1,26 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title></title>
-	</head>
-	<body>
-		<h1>Sample text {{ poop }}</h1>
-	</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+	<h1>Sample text</h1>
+	<form action="/search" method="get">
+		<input type="text" name="address" placeholder="address" />
+		<button type="submit">Search</button>
+	</form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+	// function getLocation() {
+	//     if (navigator.geolocation) {
+	//         navigator.geolocation.getCurrentPosition(showPosition);
+	//     } else {
+	//         alert("Geolocation is not supported by this browser.");
+	//     }
+	// }
+	// function showPosition(position) {
+	//     x.innerHTML = "Latitude: " + position.coords.latitude + 
+	//     "<br>Longitude: " + position.coords.longitude; 
+	// }
+</script>
+{% endblock %}

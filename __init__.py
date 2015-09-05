@@ -10,70 +10,27 @@ import private
 from urllib import urlencode
 from urllib2 import Request, urlopen
 import json
+import authorize
 
 base = "http://sandbox.delivery.com"
+client_id = private.delivery_client_id
+redirect_uri = private.delivery_redirect_uri
+url_to_add_cc_in_browser = base + "/third_party/credit_card/add?client_id=" + client_id + "&redirect_uri=" + redirect_uri + "&response_type=code&scope=global"
 
 @app.route("/")
 def index_route():
-	return render_template("index.html", poop="poopkksjdn")
+	return render_template("index.html")
 
-@app.route("/test")
-def test_route(address="3141 Chestnut St, Philadelphia, PA 19104"):
-	payload = {
-		"address": address,
-		"client_id": private.delivery_client_id
-	}
-	url = base + "/merchant/search/delivery?" + urlencode(payload)
-	req = Request(url)
-	resp = urlopen(req)
-	text = resp.read()
-	resp.close()
-	return jsonify(response=json.loads(text))
-
-@app.route("/login")
-def login_route():
-	payload = {
-		"client_id": private.delivery_client_id,
-		"redirect_uri": private.delivery_redirect_uri,
-		"response_type": "code",
-		"scope": "global",
-		"state": "login"
-	}
-	url = base + "/third_party/authorize?" + urlencode(payload)
-	return redirect(url)
-
-@app.route("/payment")
-def payment_route():
-	payload = {
-		"client_id": private.delivery_client_id,
-		"redirect_uri": private.delivery_redirect_uri,
-		"response_type": "code",
-		"scope": "global",
-		"state": "payment"
-	}
-	return redirect(base + "/third_party/credit_card/add?" + urlencode(payload))
-
-@app.route("/paymethods")
-def payment_types_route():
-	url = base + "/customer/cc"
-	req = Request(url)
-	resp = urlopen(req)
-	text = resp.read()
-	resp.close()
-	return jsonify(resp=text)
-
-@app.route("/redirect")
-def redirect_route():
-	# Params for login
-	error = request.args.get("error")
-	state = request.args.get("state")
-	code = request.args.get("code")
-	if error:
-		return jsonify(error=error, state=state, message="login failed")
-	elif code:
-		return jsonify(code=code, state=state, message="login success")
-	else:
-		return jsonify(error=error, code=code, state=state, message="I have no idea what happened")
+@app.route("/search")
+def search_route():
+	guest_token = authorize.get_guest_token(base, client_id)
+	address = request.args.get("address")
+	merchant_info = authorize.search(base, address, client_id)
+	rand_merchant = authorize.rand_merchant(merchant_info)
+	menu = authorize.get_menu(base, rand_merchant["id"], client_id)
+	# print menu
+	add_item_resp = authorize.add_item(base, guest_token, menu, rand_merchant["id"], client_id)
+	return jsonify(item_resp=add_item_resp)
 
 @app.errorhandler(404)
 def page_not_found(e):
