@@ -4,4 +4,4 @@
 # in `lib/` subdirectory.
 
 Flask==0.10
-requests==2.6.0
+requests==2.20.0
